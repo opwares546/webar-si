@@ -20,10 +20,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const sceneEl = document.getElementById("ar-scene");
   const targetEl = document.getElementById("ar-target");
   const arStage = document.getElementById("ar-stage");
+  const pedestalRing = document.getElementById("pedestal-ring");
+  const accentLight = document.getElementById("accent-light");
   const karya3dObj = document.getElementById("karya-3d-obj");
+  const karya3dRing = document.getElementById("karya-3d-ring");
   const karya3dLabel = document.getElementById("karya-3d-label");
   const heroObj = document.getElementById("interactive-hero");
 
+  const bgmMars = document.getElementById("bgm-mars");
   const btnSound = document.getElementById("btn-sound");
   const btnPhoto = document.getElementById("btn-photo");
   const btnZoomIn = document.getElementById("btn-zoom-in");
@@ -31,11 +35,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnSpin = document.getElementById("btn-spin");
   const cameraFlash = document.getElementById("camera-flash");
 
-  // ==================== SFX ENGINE (WEB AUDIO API) ====================
+  // ==================== AUDIO MARS UIN + SFX KLIK ====================
   let soundEnabled = true;
+  let isTargetVisible = false;
   let audioCtx = null;
 
-  const playTone = (freq = 580, duration = 0.08, type = "sine") => {
+  if (bgmMars) {
+    bgmMars.volume = 0.55; // Volume nyaman, tidak terlalu keras
+  }
+
+  const playTone = (freq = 580, duration = 0.07, type = "sine") => {
     if (!soundEnabled) return;
     try {
       if (!audioCtx)
@@ -44,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const gain = audioCtx.createGain();
       osc.type = type;
       osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
       gain.gain.exponentialRampToValueAtTime(
         0.001,
         audioCtx.currentTime + duration,
@@ -56,43 +65,60 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (e) {}
   };
 
+  const syncMarsAudio = () => {
+    if (!bgmMars) return;
+    if (soundEnabled && isTargetVisible) {
+      bgmMars.play().catch(() => {});
+    } else {
+      bgmMars.pause();
+    }
+  };
+
   btnSound.addEventListener("click", () => {
     soundEnabled = !soundEnabled;
     btnSound.textContent = soundEnabled ? "🔊" : "🔇";
-    if (soundEnabled) playTone(660, 0.08);
+    btnSound.title = soundEnabled ? "Mars UIN Aktif" : "Suara Dimatikan";
+    syncMarsAudio();
+    if (soundEnabled) playTone(680, 0.06);
   });
 
-  // ==================== DATA KONTEN ====================
+  // ==================== DATA KONTEN & TEMA WARNA ====================
   const menuData = {
     utama: {
       title: "Selamat Datang di Prodi SI",
       desc: "Sentuh objek 3D atau pilih menu di bawah untuk menjelajahi profil, jalur masuk, prospek karir, dan inovasi mahasiswa.",
       link: null,
+      accent: "#10b981",
     },
     profil: {
       title: "Profil Prodi Sistem Informasi",
       desc: "Berada di bawah Fakultas Ekonomi dan Bisnis Islam (FEBI) UIN Mahmud Yunus Batusangkar. Memadukan teknologi informasi, manajemen, dan bisnis digital.",
       link: "https://uinmybatusangkar.ac.id",
+      accent: "#38bdf8",
     },
     daftar: {
       title: "Info Pendaftaran Mahasiswa Baru",
       desc: "Penerimaan dibuka melalui jalur SPAN-PTKIN, UM-PTKIN, dan Jalur Mandiri. Klik tombol di bawah untuk info jadwal & syarat resmi.",
       link: "https://pmb.uinmybatusangkar.ac.id",
+      accent: "#10b981",
     },
     karir: {
       title: "Prospek Karir Lulusan SI",
       desc: "Siap berkarir sebagai System Analyst, Full-Stack Developer, UI/UX Designer, Data Analyst, ERP Consultant, hingga IT Project Manager.",
       link: null,
+      accent: "#818cf8",
     },
     karya: {
       title: "Showcase Karya Mahasiswa",
       desc: "Pilih salah satu proyek unggulan di atas untuk melihat detail inovasi mahasiswa Sistem Informasi.",
       link: null,
+      accent: "#f59e0b",
     },
     hmps: {
       title: "Kegiatan HMPS SI",
       desc: "Aktif menggelar IT FEST, workshop pemrograman & desain grafis, pengabdian masyarakat, serta kegiatan pengembangan soft-skill mahasiswa.",
       link: "https://instagram.com",
+      accent: "#f43f5e",
     },
   };
 
@@ -132,9 +158,23 @@ document.addEventListener("DOMContentLoaded", () => {
     hmps: document.getElementById("scene-hmps"),
   };
 
+  let currentMenu = "utama";
+
   // ==================== MULAI KAMERA AR ====================
   btnStart.addEventListener("click", async () => {
-    playTone(520, 0.1);
+    playTone(520, 0.09);
+
+    // Unlock audio di browser HP (iOS/Android butuh interaksi tombol pertama)
+    if (bgmMars) {
+      bgmMars
+        .play()
+        .then(() => {
+          bgmMars.pause();
+          bgmMars.currentTime = 0;
+        })
+        .catch(() => {});
+    }
+
     splash.classList.add("hidden");
     topHud.style.display = "flex";
     scannerOverlay.style.display = "flex";
@@ -147,38 +187,55 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ==================== EVENT MARKER ====================
   targetEl.addEventListener("targetFound", () => {
-    playTone(880, 0.12, "triangle");
+    isTargetVisible = true;
     scannerOverlay.style.display = "none";
     hudNav.style.display = "flex";
     sideControls.style.display = "flex";
     statusDot.classList.add("found");
     statusText.textContent = "Marker Terdeteksi";
+
+    // Trigger animasi pop-in & putar Mars UIN
+    scenes[currentMenu]?.emit("popin");
+    syncMarsAudio();
   });
 
   targetEl.addEventListener("targetLost", () => {
+    isTargetVisible = false;
     scannerOverlay.style.display = "flex";
     statusDot.classList.remove("found");
     statusText.textContent = "Mencari Marker...";
+
+    // Otomatis pause Mars UIN saat kamera lepas dari marker
+    syncMarsAudio();
   });
 
   // ==================== GANTI 6 MENU ====================
   const switchMenu = (key) => {
-    playTone(620, 0.07);
+    currentMenu = key;
+    playTone(620, 0.06);
 
     Object.entries(scenes).forEach(([k, el]) => {
-      if (el) el.setAttribute("visible", k === key);
+      if (!el) return;
+      const active = k === key;
+      el.setAttribute("visible", active);
+      if (active) el.emit("popin"); // Efek pop-in membal saat ganti menu
     });
 
     hudButtons.forEach((btn) => {
       btn.classList.toggle("active", btn.dataset.menu === key);
     });
 
+    const data = menuData[key];
+    if (data?.accent) {
+      pedestalRing?.setAttribute("color", data.accent);
+      accentLight?.setAttribute("color", data.accent);
+    }
+
     if (key === "karya") {
       karyaPillsBox.style.display = "flex";
       selectKarya("koperasiku");
     } else {
       karyaPillsBox.style.display = "none";
-      const data = menuData[key];
       if (data) {
         cardTitle.textContent = data.title;
         cardDesc.textContent = data.desc;
@@ -206,7 +263,10 @@ document.addEventListener("DOMContentLoaded", () => {
     cardLink.style.display = "none";
 
     karya3dObj.setAttribute("color", item.color);
+    karya3dRing.setAttribute("color", item.color);
+    pedestalRing?.setAttribute("color", item.color);
     karya3dLabel.setAttribute("value", item.label);
+    scenes.karya?.emit("popin");
   };
 
   hudButtons.forEach((btn) => {
@@ -215,19 +275,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   karyaPills.forEach((pill) => {
     pill.addEventListener("click", () => {
-      playTone(720, 0.06);
+      playTone(720, 0.05);
       selectKarya(pill.dataset.karya);
     });
   });
 
   btnCloseCard.addEventListener("click", () => {
-    playTone(400, 0.06);
+    playTone(400, 0.05);
     infoCard.classList.remove("show");
   });
 
-  // Klik langsung objek 3D utama -> buka info & efek loncat
+  // Sentuh objek 3D utama -> animasi berputar cepat + buka info
   heroObj?.addEventListener("click", () => {
-    playTone(920, 0.1, "triangle");
+    playTone(900, 0.09, "triangle");
+    heroObj.emit("tapped");
     switchMenu("utama");
   });
 
@@ -254,7 +315,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   btnSpin.addEventListener("click", () => {
-    playTone(600, 0.06);
+    playTone(600, 0.05);
     currentRotY = (currentRotY + 90) % 360;
     arStage.setAttribute("rotation", `0 ${currentRotY} 0`);
   });
@@ -274,11 +335,9 @@ document.addEventListener("DOMContentLoaded", () => {
     outCanvas.height = glCanvas.height;
     const ctx = outCanvas.getContext("2d");
 
-    // Gambar feed kamera lalu tumpuk dengan layer 3D WebGL
     ctx.drawImage(video, 0, 0, outCanvas.width, outCanvas.height);
     ctx.drawImage(glCanvas, 0, 0, outCanvas.width, outCanvas.height);
 
-    // Watermark kecil di pojok bawah
     ctx.fillStyle = "rgba(2, 6, 23, 0.65)";
     ctx.fillRect(16, outCanvas.height - 46, 270, 30);
     ctx.fillStyle = "#34d399";
