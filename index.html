@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <title>WebAR Sistem Informasi - HMPS SI UINMYBSK</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- A-Frame & MindAR -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+
+    <link rel="stylesheet" href="./css/style.css" />
+  </head>
+  <body>
+    <!-- Efek Kilatan Foto -->
+    <div id="camera-flash"></div>
+
+    <!-- 1. Splash Screen -->
+    <div id="splash-screen">
+      <div class="splash-orb">SI</div>
+      <div class="splash-badge">HMPS SI • UIN Mahmud Yunus Batusangkar</div>
+      <h1>WebAR Sistem Informasi</h1>
+      <p>
+        Pindai brosur resmi Prodi Sistem Informasi untuk menjelajahi profil,
+        prospek karir, dan showcase karya mahasiswa dalam bentuk 3D interaktif.
+      </p>
+      <button id="btn-start-ar">Aktifkan Kamera AR</button>
+    </div>
+
+    <!-- 2. Top Bar HUD -->
+    <div id="top-hud">
+      <div class="hud-pill">
+        <span id="status-dot" class="status-dot"></span>
+        <span id="status-text">Mencari Marker...</span>
+      </div>
+      <div class="top-actions">
+        <button id="btn-sound" class="icon-btn" title="Suara Aktif">🔊</button>
+        <button id="btn-photo" class="icon-btn" title="Ambil Foto AR">
+          📸
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. Scanner Reticle & Laser -->
+    <div id="scanner-overlay">
+      <div class="scanner-box">
+        <div class="corner tl"></div>
+        <div class="corner tr"></div>
+        <div class="corner bl"></div>
+        <div class="corner br"></div>
+        <div class="scan-line"></div>
+      </div>
+      <div class="scanner-text">Arahkan kamera ke brosur Prodi SI</div>
+    </div>
+
+    <!-- 4. Kontrol 3D Samping (Zoom & Reset) -->
+    <div id="side-controls">
+      <button id="btn-zoom-in" class="icon-btn" title="Perbesar 3D">➕</button>
+      <button id="btn-zoom-out" class="icon-btn" title="Perkecil 3D">➖</button>
+      <button id="btn-spin" class="icon-btn" title="Putar 90°">🔄</button>
+    </div>
+
+    <!-- 5. Kartu Detail & Sub-Menu Karya -->
+    <div id="info-card">
+      <h3 id="card-title">Judul Menu</h3>
+      <div id="karya-pills">
+        <button class="karya-pill active" data-karya="koperasiku">
+          Koperasiku
+        </button>
+        <button class="karya-pill" data-karya="juragantani">Juragantani</button>
+        <button class="karya-pill" data-karya="ews">EWS Anti-Drone</button>
+        <button class="karya-pill" data-karya="smartcar">Smart Car</button>
+      </div>
+      <p id="card-desc">Deskripsi konten akan muncul di sini.</p>
+      <div class="card-actions">
+        <a
+          id="card-link"
+          href="#"
+          target="_blank"
+          class="btn-link"
+          style="display: none"
+          >Buka Link</a
+        >
+        <button id="btn-close-card" class="btn-close">Tutup</button>
+      </div>
+    </div>
+
+    <!-- 6. Menu Navigasi Bawah (6 Menu Utama) -->
+    <div id="hud-nav">
+      <button class="hud-btn active" data-menu="utama">🏠 Utama</button>
+      <button class="hud-btn" data-menu="profil">🎓 Profil</button>
+      <button class="hud-btn" data-menu="daftar">📝 Daftar</button>
+      <button class="hud-btn" data-menu="karir">💼 Karir</button>
+      <button class="hud-btn" data-menu="karya">🚀 Karya</button>
+      <button class="hud-btn" data-menu="hmps">🔥 HMPS SI</button>
+    </div>
+
+    <!-- 7. Scene AR (MindAR + A-Frame) -->
+    <a-scene
+      id="ar-scene"
+      mindar-image="imageTargetSrc: ./assets/targets/targets.mind; autoStart: false; uiLoading: no; uiScanning: no;"
+      color-space="sRGB"
+      renderer="colorManagement: true; physicallyCorrectLights: true; preserveDrawingBuffer: true;"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+    >
+      <a-assets>
+        <!-- NANTI MASUKKAN FILE .GLB & .MP4 DARI TIM DI SINI -->
+        <!-- <a-asset-item id="model-logo" src="./assets/models/logo-hmps.glb"></a-asset-item> -->
+      </a-assets>
+
+      <a-camera
+        position="0 0 0"
+        look-controls="enabled: false"
+        cursor="fuse: false; rayOrigin: mouse;"
+        raycaster="objects: .clickable"
+      ></a-camera>
+
+      <!-- Pencahayaan biar 3D lebih hidup -->
+      <a-light type="ambient" color="#ffffff" intensity="1.2"></a-light>
+      <a-light
+        type="directional"
+        color="#34d399"
+        intensity="1.5"
+        position="1 2 2"
+      ></a-light>
+
+      <!-- Target Marker -->
+      <a-entity id="ar-target" mindar-image-target="targetIndex: 0">
+        <!-- Wrapper Utama (untuk fitur Zoom & Putar) -->
+        <a-entity id="ar-stage" scale="1 1 1" rotation="0 0 0">
+          <!-- Hologram Pedestal (Cincin Bercahaya di Bawah Objek) -->
+          <a-ring
+            position="0 -0.28 0.04"
+            radius-inner="0.34"
+            radius-outer="0.38"
+            color="#10b981"
+            opacity="0.85"
+            animation="property: rotation; to: 0 0 360; loop: true; dur: 7000; easing: linear"
+          ></a-ring>
+          <a-ring
+            position="0 -0.28 0.03"
+            radius-inner="0.42"
+            radius-outer="0.44"
+            color="#38bdf8"
+            opacity="0.55"
+            animation="property: rotation; to: 0 0 -360; loop: true; dur: 11000; easing: linear"
+          ></a-ring>
+
+          <!-- KONTEN 1: MENU UTAMA -->
+          <a-entity id="scene-utama" visible="true">
+            <!-- Placeholder 3D Berlapis (nanti ganti dengan <a-gltf-model src="#model-logo">) -->
+            <a-octahedron
+              id="interactive-hero"
+              class="clickable"
+              position="0 0.18 0.16"
+              radius="0.22"
+              color="#10b981"
+              metalness="0.35"
+              roughness="0.2"
+              animation="property: rotation; to: 0 360 0; loop: true; dur: 6000; easing: linear"
+              animation__float="property: position; to: 0 0.25 0.16; dir: alternate; loop: true; dur: 1800; easing: easeInOutSine"
+            ></a-octahedron>
+            <a-torus
+              position="0 0.18 0.16"
+              radius="0.32"
+              radius-tubular="0.012"
+              color="#38bdf8"
+              animation="property: rotation; to: 360 180 0; loop: true; dur: 8000; easing: linear"
+            ></a-torus>
+            <a-text
+              value="SISTEM INFORMASI\nUINMYBSK"
+              align="center"
+              position="0 -0.18 0.12"
+              scale="0.42 0.42 0.42"
+              color="#ffffff"
+            ></a-text>
+          </a-entity>
+
+          <!-- KONTEN 2: PROFIL PRODI -->
+          <a-entity id="scene-profil" visible="false">
+            <a-plane
+              position="0 0.16 0.1"
+              width="1.15"
+              height="0.65"
+              color="#0f172a"
+              opacity="0.92"
+            ></a-plane>
+            <a-plane
+              position="0 0.48 0.11"
+              width="1.15"
+              height="0.05"
+              color="#10b981"
+            ></a-plane>
+            <a-text
+              value="PROFIL PRODI SI\nFEBI - UIN Mahmud Yunus Batusangkar\nIntegrasi Teknologi & Bisnis Islam"
+              align="center"
+              position="0 0.16 0.12"
+              scale="0.3 0.3 0.3"
+              color="#f8fafc"
+            ></a-text>
+          </a-entity>
+
+          <!-- KONTEN 3: INFO PENDAFTARAN -->
+          <a-entity id="scene-daftar" visible="false">
+            <a-plane
+              position="0 0.16 0.1"
+              width="1.15"
+              height="0.65"
+              color="#064e3b"
+              opacity="0.94"
+            ></a-plane>
+            <a-text
+              value="PENDAFTARAN MAHASISWA BARU\n• SPAN-PTKIN\n• UM-PTKIN\n• Jalur Mandiri"
+              align="center"
+              position="0 0.16 0.12"
+              scale="0.31 0.31 0.31"
+              color="#ecfdf5"
+            ></a-text>
+          </a-entity>
+
+          <!-- KONTEN 4: PROSPEK KARIR -->
+          <a-entity id="scene-karir" visible="false">
+            <a-plane
+              position="0 0.16 0.1"
+              width="1.15"
+              height="0.65"
+              color="#1e1b4b"
+              opacity="0.94"
+            ></a-plane>
+            <a-text
+              value="PROSPEK KARIR LULUSAN\nSystem Analyst • Web Developer\nUI/UX Designer • Data Analyst\nERP Consultant"
+              align="center"
+              position="0 0.16 0.12"
+              scale="0.29 0.29 0.29"
+              color="#e0e7ff"
+            ></a-text>
+          </a-entity>
+
+          <!-- KONTEN 5: SHOWCASE KARYA (Dinamis berubah sesuai pill karya) -->
+          <a-entity id="scene-karya" visible="false">
+            <a-dodecahedron
+              id="karya-3d-obj"
+              class="clickable"
+              position="0 0.22 0.16"
+              radius="0.2"
+              color="#f59e0b"
+              animation="property: rotation; to: 360 360 0; loop: true; dur: 7000; easing: linear"
+            ></a-dodecahedron>
+            <a-text
+              id="karya-3d-label"
+              value="KOPERASIKU\nAplikasi Manajemen Koperasi"
+              align="center"
+              position="0 -0.14 0.12"
+              scale="0.33 0.33 0.33"
+              color="#fef3c7"
+            ></a-text>
+          </a-entity>
+
+          <!-- KONTEN 6: KEGIATAN HMPS SI -->
+          <a-entity id="scene-hmps" visible="false">
+            <a-plane
+              position="0 0.16 0.1"
+              width="1.15"
+              height="0.65"
+              color="#4c0519"
+              opacity="0.94"
+            ></a-plane>
+            <a-text
+              value="HMPS SISTEM INFORMASI\nIT FEST • Workshop Desain & Web\nPengabdian Masyarakat • Outbound"
+              align="center"
+              position="0 0.16 0.12"
+              scale="0.3 0.3 0.3"
+              color="#ffe4e6"
+            ></a-text>
+          </a-entity>
+        </a-entity>
+      </a-entity>
+    </a-scene>
+
+    <script src="./js/app.js"></script>
+  </body>
+</html>

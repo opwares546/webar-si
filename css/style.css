@@ -1,0 +1,447 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family:
+    "Poppins",
+    system-ui,
+    -apple-system,
+    sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overflow: hidden;
+  background: #020617;
+  color: #f8fafc;
+}
+
+/* ==================== SPLASH SCREEN ==================== */
+#splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  background: radial-gradient(
+    circle at top right,
+    #0d9488 0%,
+    #1e3a8a 45%,
+    #020617 100%
+  );
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 28px;
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+}
+
+#splash-screen.hidden {
+  opacity: 0;
+  transform: scale(1.05);
+  pointer-events: none;
+}
+
+.splash-orb {
+  width: 84px;
+  height: 84px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #10b981, #38bdf8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 800;
+  color: #020617;
+  margin-bottom: 20px;
+  box-shadow: 0 0 40px rgba(16, 185, 129, 0.5);
+  animation: floatOrb 3s ease-in-out infinite;
+}
+
+@keyframes floatOrb {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.splash-badge {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 6px 16px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  color: #a7f3d0;
+}
+
+#splash-screen h1 {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+#splash-screen p {
+  font-size: 13.5px;
+  color: #cbd5e1;
+  max-width: 340px;
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+#btn-start-ar {
+  background: linear-gradient(90deg, #10b981, #06b6d4);
+  color: #020617;
+  border: none;
+  padding: 15px 36px;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+#btn-start-ar:active {
+  transform: scale(0.95);
+}
+
+/* ==================== TOP BAR HUD ==================== */
+#top-hud {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 30;
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.hud-pill {
+  pointer-events: auto;
+  background: rgba(2, 6, 23, 0.72);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 7px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 0 10px #f59e0b;
+  animation: pulseDot 1.4s infinite;
+}
+
+.status-dot.found {
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: none;
+}
+
+@keyframes pulseDot {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.top-actions {
+  pointer-events: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f8fafc;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:active {
+  transform: scale(0.9);
+  background: #10b981;
+  color: #020617;
+}
+
+/* ==================== SCANNER RETICLE ==================== */
+#scanner-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.scanner-box {
+  width: 230px;
+  height: 230px;
+  position: relative;
+}
+
+.corner {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  border: 3.5px solid #10b981;
+  filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.7));
+}
+
+.corner.tl {
+  top: 0;
+  left: 0;
+  border-right: none;
+  border-bottom: none;
+  border-radius: 12px 0 0 0;
+}
+.corner.tr {
+  top: 0;
+  right: 0;
+  border-left: none;
+  border-bottom: none;
+  border-radius: 0 12px 0 0;
+}
+.corner.bl {
+  bottom: 0;
+  left: 0;
+  border-right: none;
+  border-top: none;
+  border-radius: 0 0 0 12px;
+}
+.corner.br {
+  bottom: 0;
+  right: 0;
+  border-left: none;
+  border-top: none;
+  border-radius: 0 0 12px 0;
+}
+
+.scan-line {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #34d399, transparent);
+  box-shadow: 0 0 12px #10b981;
+  animation: scanMove 2.2s ease-in-out infinite;
+}
+
+@keyframes scanMove {
+  0%,
+  100% {
+    top: 12px;
+    opacity: 0.4;
+  }
+  50% {
+    top: 212px;
+    opacity: 1;
+  }
+}
+
+.scanner-text {
+  margin-top: 18px;
+  background: rgba(2, 6, 23, 0.78);
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ==================== SIDE 3D CONTROLS ==================== */
+#side-controls {
+  position: fixed;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 25;
+  display: none;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ==================== INFO DRAWER ==================== */
+#info-card {
+  position: fixed;
+  bottom: 84px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 25;
+  width: 92vw;
+  max-width: 420px;
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(52, 211, 153, 0.35);
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.45);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#info-card.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#info-card h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: #34d399;
+  margin-bottom: 6px;
+}
+
+#info-card p {
+  font-size: 12.8px;
+  color: #e2e8f0;
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+
+/* Sub-pills khusus Showcase Karya */
+#karya-pills {
+  display: none;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.karya-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.karya-pill.active {
+  background: #f59e0b;
+  color: #020617;
+  border-color: #f59e0b;
+}
+
+.card-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.btn-link {
+  background: linear-gradient(90deg, #2563eb, #06b6d4);
+  color: #fff;
+  text-decoration: none;
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.btn-close {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e2e8f0;
+  border: none;
+  padding: 7px 14px;
+  border-radius: 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* ==================== BOTTOM HUD NAV ==================== */
+#hud-nav {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  display: none;
+  gap: 6px;
+  background: rgba(2, 6, 23, 0.84);
+  backdrop-filter: blur(12px);
+  padding: 8px 10px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  max-width: 94vw;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+#hud-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.hud-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #e2e8f0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 9px 13px;
+  border-radius: 13px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hud-btn.active {
+  background: linear-gradient(90deg, #10b981, #06b6d4);
+  color: #020617;
+  border-color: transparent;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+/* ==================== FLASH EFFECT (SCREENSHOT) ==================== */
+#camera-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #ffffff;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+#camera-flash.flash {
+  opacity: 0.85;
+}
