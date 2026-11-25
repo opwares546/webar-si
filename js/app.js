@@ -14,8 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const cardDesc = document.getElementById("card-desc");
   const cardLink = document.getElementById("card-link");
   const btnCloseCard = document.getElementById("btn-close-card");
+
   const karyaPillsBox = document.getElementById("karya-pills");
-  const karyaPills = document.querySelectorAll(".karya-pill");
+  const karyaPills = document.querySelectorAll(".karya-pill[data-karya]");
+  const videoPillsBox = document.getElementById("video-pills");
+  const videoPills = document.querySelectorAll(".video-pill");
 
   const sceneEl = document.getElementById("ar-scene");
   const targetEl = document.getElementById("ar-target");
@@ -24,11 +27,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const accentLight = document.getElementById("accent-light");
   const karya3dLabel = document.getElementById("karya-3d-label");
   const heroObj = document.getElementById("interactive-hero");
+  const arVideoScreen = document.getElementById("ar-video-screen");
+  const video3dTitle = document.getElementById("video-3d-title");
 
   const karyaModels = {
     laptop: document.getElementById("karya-model-laptop"),
     drone: document.getElementById("karya-model-drone"),
     robot: document.getElementById("karya-model-robot"),
+  };
+
+  const videos = {
+    "vid-1": document.getElementById("vid-1"),
+    "vid-2": document.getElementById("vid-2"),
+    "vid-3": document.getElementById("vid-3"),
   };
 
   const bgmMars = document.getElementById("bgm-mars");
@@ -86,6 +97,38 @@ document.addEventListener("DOMContentLoaded", () => {
     if (soundEnabled) playTone(680, 0.06);
   });
 
+  // ==================== KONTROL 3 VIDEO SHOWCASE ====================
+  let activeVidId = "vid-1";
+
+  const playSelectedVideo = (vidId) => {
+    activeVidId = vidId;
+    Object.entries(videos).forEach(([id, el]) => {
+      if (!el) return;
+      if (id === vidId) {
+        el.play().catch(() => {});
+      } else {
+        el.pause();
+      }
+    });
+    arVideoScreen?.setAttribute("src", `#${vidId}`);
+    videoPills.forEach((p) =>
+      p.classList.toggle("active", p.dataset.vid === vidId),
+    );
+    const idx = vidId.split("-")[1];
+    video3dTitle?.setAttribute("value", `VIDEO SHOWCASE • ${idx} / 3`);
+  };
+
+  const pauseAllVideos = () => {
+    Object.values(videos).forEach((el) => el?.pause());
+  };
+
+  videoPills.forEach((pill) => {
+    pill.addEventListener("click", () => {
+      playTone(720, 0.05);
+      playSelectedVideo(pill.dataset.vid);
+    });
+  });
+
   // ==================== DATA KONTEN ====================
   const menuData = {
     utama: {
@@ -119,7 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
       accent: "#f59e0b",
     },
     hmps: {
-      title: "Kegiatan HMPS SI",
+      title: "Kegiatan & Video HMPS SI",
       desc: "Aktif menggelar IT FEST, workshop pemrograman & desain grafis, pengabdian masyarakat, serta kegiatan pengembangan soft-skill mahasiswa.",
       link: "https://instagram.com",
       accent: "#f43f5e",
@@ -184,6 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
   btnStart.addEventListener("click", async () => {
     playTone(520, 0.09);
 
+    // Unlock audio & video di browser HP saat interaksi tombol pertama
     if (bgmMars) {
       bgmMars
         .play()
@@ -193,6 +237,15 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(() => {});
     }
+    Object.values(videos).forEach((v) => {
+      if (!v) return;
+      v.play()
+        .then(() => {
+          v.pause();
+          v.currentTime = 0;
+        })
+        .catch(() => {});
+    });
 
     splash.classList.add("hidden");
     topHud.style.display = "flex";
@@ -215,6 +268,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     scenes[currentMenu]?.emit("popin");
     syncMarsAudio();
+
+    if (currentMenu === "hmps") {
+      playSelectedVideo(activeVidId);
+    }
   });
 
   targetEl.addEventListener("targetLost", () => {
@@ -224,6 +281,7 @@ document.addEventListener("DOMContentLoaded", () => {
     statusText.textContent = "Mencari Marker...";
 
     syncMarsAudio();
+    pauseAllVideos();
   });
 
   // ==================== GANTI 6 MENU ====================
@@ -248,11 +306,27 @@ document.addEventListener("DOMContentLoaded", () => {
       accentLight?.setAttribute("color", data.accent);
     }
 
+    // Atur visibilitas sub-menu Karya & Video
+    karyaPillsBox.style.display = key === "karya" ? "flex" : "none";
+    videoPillsBox.style.display = key === "hmps" ? "flex" : "none";
+
     if (key === "karya") {
-      karyaPillsBox.style.display = "flex";
+      pauseAllVideos();
       selectKarya("koperasiku");
+    } else if (key === "hmps") {
+      if (isTargetVisible) {
+        playSelectedVideo(activeVidId);
+      }
+      cardTitle.textContent = data.title;
+      cardDesc.textContent = data.desc;
+      if (data.link) {
+        cardLink.href = data.link;
+        cardLink.style.display = "inline-block";
+      } else {
+        cardLink.style.display = "none";
+      }
     } else {
-      karyaPillsBox.style.display = "none";
+      pauseAllVideos();
       if (data) {
         cardTitle.textContent = data.title;
         cardDesc.textContent = data.desc;

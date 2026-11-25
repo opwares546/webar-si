@@ -40,7 +40,8 @@
       <h1>WebAR Sistem Informasi</h1>
       <p>
         Pindai brosur resmi Prodi Sistem Informasi untuk menjelajahi profil,
-        prospek karir, dan showcase karya mahasiswa dalam bentuk 3D interaktif.
+        prospek karir, showcase karya, dan video kegiatan dalam bentuk 3D
+        interaktif.
       </p>
       <button id="btn-start-ar">Aktifkan Kamera AR</button>
     </div>
@@ -80,9 +81,11 @@
       <button id="btn-spin" class="icon-btn" title="Putar 90°">🔄</button>
     </div>
 
-    <!-- 5. Kartu Detail & Sub-Menu Karya -->
+    <!-- 5. Kartu Detail, Sub-Menu Karya & Sub-Menu Video -->
     <div id="info-card">
       <h3 id="card-title">Judul Menu</h3>
+
+      <!-- Pilihan 5 Proyek Karya -->
       <div id="karya-pills">
         <button class="karya-pill active" data-karya="koperasiku">
           Koperasiku
@@ -92,6 +95,19 @@
         <button class="karya-pill" data-karya="ews">EWS Anti-Drone</button>
         <button class="karya-pill" data-karya="smartcar">Smart Car</button>
       </div>
+
+      <!-- Pilihan 3 Video HMPS SI -->
+      <div
+        id="video-pills"
+        style="display: none; flex-wrap: wrap; gap: 6px; margin-bottom: 12px"
+      >
+        <button class="karya-pill video-pill active" data-vid="vid-1">
+          Video 1
+        </button>
+        <button class="karya-pill video-pill" data-vid="vid-2">Video 2</button>
+        <button class="karya-pill video-pill" data-vid="vid-3">Video 3</button>
+      </div>
+
       <p id="card-desc">Deskripsi konten akan muncul di sini.</p>
       <div class="card-actions">
         <a
@@ -126,7 +142,10 @@
       device-orientation-permission-ui="enabled: false"
     >
       <a-assets>
+        <!-- Logo HMPS -->
         <img id="img-logo-hmps" src="./assets/ui/logo-hmps.png" />
+
+        <!-- 3 Model 3D (.glb) -->
         <a-asset-item
           id="model-laptop"
           src="./assets/models/laptop.glb"
@@ -139,6 +158,38 @@
           id="model-robot"
           src="./assets/models/robot.glb"
         ></a-asset-item>
+
+        <!-- 3 Video Showcase (.mp4) -->
+        <video
+          id="vid-1"
+          src="./assets/videos/video-1.mp4"
+          preload="metadata"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          crossorigin="anonymous"
+        ></video>
+        <video
+          id="vid-2"
+          src="./assets/videos/video-2.mp4"
+          preload="metadata"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          crossorigin="anonymous"
+        ></video>
+        <video
+          id="vid-3"
+          src="./assets/videos/video-3.mp4"
+          preload="metadata"
+          loop
+          muted
+          playsinline
+          webkit-playsinline
+          crossorigin="anonymous"
+        ></video>
       </a-assets>
 
       <a-camera
@@ -505,49 +556,46 @@
             </a-entity>
           </a-entity>
 
-          <!-- ===== KONTEN 6: KEGIATAN HMPS SI ===== -->
+          <!-- ===== KONTEN 6: KEGIATAN HMPS SI (LAYAR 3 VIDEO SHOWCASE) ===== -->
           <a-entity
             id="scene-hmps"
             visible="false"
             animation__pop="property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 500; easing: easeOutBack; startEvents: popin"
           >
             <a-entity
-              animation="property: position; from: 0 0.14 0.12; to: 0 0.19 0.12; dir: alternate; loop: true; dur: 2400; easing: easeInOutSine"
+              animation="property: position; from: 0 0.14 0.14; to: 0 0.19 0.14; dir: alternate; loop: true; dur: 2400; easing: easeInOutSine"
             >
+              <!-- Bingkai Neon Belakang -->
               <a-plane
                 position="0 0 -0.02"
                 width="1.22"
-                height="0.72"
+                height="0.74"
                 color="#f43f5e"
-                opacity="0.3"
+                opacity="0.35"
               ></a-plane>
-              <a-box
+              <!-- Layar Bioskop 3D 16:9 -->
+              <a-video
+                id="ar-video-screen"
+                src="#vid-1"
                 width="1.16"
-                height="0.66"
-                depth="0.03"
-                color="#4c0519"
-                opacity="0.94"
-              ></a-box>
+                height="0.65"
+                position="0 0 0.01"
+              ></a-video>
+              <!-- Header Badge -->
               <a-box
-                position="0 0.35 0.05"
-                width="0.78"
-                height="0.13"
-                depth="0.025"
+                position="0 0.37 0.04"
+                width="0.82"
+                height="0.11"
+                depth="0.02"
                 color="#e11d48"
               ></a-box>
               <a-text
-                value="KEGIATAN HMPS SI"
+                id="video-3d-title"
+                value="VIDEO SHOWCASE • 1 / 3"
                 align="center"
-                position="0 0.35 0.07"
-                scale="0.27 0.27 0.27"
-                color="#ffffff"
-              ></a-text>
-              <a-text
-                value="• IT FEST (Kompetisi Web & Desain)\n• Workshop Coding & Graphic Design\n• Pengabdian Sosial & Tanggap Bencana\n• Outbound & Pengembangan Leadership"
-                align="center"
-                position="0 -0.02 0.03"
+                position="0 0.37 0.06"
                 scale="0.24 0.24 0.24"
-                color="#ffe4e6"
+                color="#ffffff"
               ></a-text>
             </a-entity>
           </a-entity>
