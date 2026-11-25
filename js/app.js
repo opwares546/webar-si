@@ -22,10 +22,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const arStage = document.getElementById("ar-stage");
   const pedestalRing = document.getElementById("pedestal-ring");
   const accentLight = document.getElementById("accent-light");
-  const karya3dObj = document.getElementById("karya-3d-obj");
-  const karya3dRing = document.getElementById("karya-3d-ring");
   const karya3dLabel = document.getElementById("karya-3d-label");
   const heroObj = document.getElementById("interactive-hero");
+
+  const karyaModels = {
+    laptop: document.getElementById("karya-model-laptop"),
+    drone: document.getElementById("karya-model-drone"),
+    robot: document.getElementById("karya-model-robot"),
+  };
 
   const bgmMars = document.getElementById("bgm-mars");
   const btnSound = document.getElementById("btn-sound");
@@ -41,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let audioCtx = null;
 
   if (bgmMars) {
-    bgmMars.volume = 0.55; // Volume nyaman, tidak terlalu keras
+    bgmMars.volume = 0.55;
   }
 
   const playTone = (freq = 580, duration = 0.07, type = "sine") => {
@@ -82,11 +86,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (soundEnabled) playTone(680, 0.06);
   });
 
-  // ==================== DATA KONTEN & TEMA WARNA ====================
+  // ==================== DATA KONTEN ====================
   const menuData = {
     utama: {
       title: "Selamat Datang di Prodi SI",
-      desc: "Sentuh objek 3D atau pilih menu di bawah untuk menjelajahi profil, jalur masuk, prospek karir, dan inovasi mahasiswa.",
+      desc: "Sentuh Medali 3D atau pilih menu di bawah untuk menjelajahi profil, jalur masuk, prospek karir, dan inovasi mahasiswa.",
       link: null,
       accent: "#10b981",
     },
@@ -110,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     karya: {
       title: "Showcase Karya Mahasiswa",
-      desc: "Pilih salah satu proyek unggulan di atas untuk melihat detail inovasi mahasiswa Sistem Informasi.",
+      desc: "Pilih salah satu proyek unggulan di atas untuk melihat model 3D dan detail inovasi mahasiswa Sistem Informasi.",
       link: null,
       accent: "#f59e0b",
     },
@@ -125,27 +129,43 @@ document.addEventListener("DOMContentLoaded", () => {
   const karyaData = {
     koperasiku: {
       title: "Koperasiku (Web App)",
-      desc: "Sistem manajemen koperasi digital berbasis Laravel untuk pencatatan simpan pinjam dan laporan keuangan transparan.",
+      desc: "Aplikasi manajemen koperasi digital berbasis Laravel, Inertia.js, dan Vue.js untuk pengelolaan data anggota serta transaksi simpan pinjam.",
       color: "#10b981",
       label: "KOPERASIKU\nManajemen Koperasi Digital",
+      model: "laptop",
+      link: null,
     },
-    juragantani: {
-      title: "Juragantani (Agri-Tech)",
-      desc: "Platform direktori pertanian yang menghubungkan petani langsung dengan pengepul hasil bumi terverifikasi.",
-      color: "#84cc16",
-      label: "JURAGANTANI\nPlatform Direktori Pertanian",
+    egoosport: {
+      title: "Egoo Sport (E-Commerce)",
+      desc: "Platform e-commerce perlengkapan olahraga berbasis PHP & MySQL dengan katalog interaktif dan sistem keranjang belanja.",
+      color: "#f97316",
+      label: "EGOO SPORT\nE-Commerce Perlengkapan Olahraga",
+      model: "laptop",
+      link: null,
+    },
+    spksmart: {
+      title: "SPK MVP La Liga (SMART)",
+      desc: "Sistem Penunjang Keputusan berbasis Laravel & Vue.js menggunakan metode SMART, lengkap dengan grafik interaktif dan ekspor PDF.",
+      color: "#eab308",
+      label: "SPK METODE SMART\nSistem Penunjang Keputusan",
+      model: "laptop",
+      link: "https://github.com/opwares546/spk-laliga",
     },
     ews: {
       title: "EWS Anti-Drone (IoT + AI)",
       desc: "Sistem peringatan dini pendeteksi drone menggabungkan sensor radar ESP8266, computer vision YOLOv8, dan pelacakan kamera otomatis.",
       color: "#f43f5e",
       label: "EWS ANTI-DRONE\nIoT Radar & YOLOv8 AI",
+      model: "drone",
+      link: null,
     },
     smartcar: {
       title: "Smart Robot Car (IoT)",
       desc: "Mobil robot pintar berbasis ESP8266 Wi-Fi dengan layar OLED ekspresif yang dikembangkan untuk pameran teknologi kampus.",
       color: "#38bdf8",
       label: "SMART ROBOT CAR\nESP8266 Wi-Fi + OLED",
+      model: "robot",
+      link: null,
     },
   };
 
@@ -164,7 +184,6 @@ document.addEventListener("DOMContentLoaded", () => {
   btnStart.addEventListener("click", async () => {
     playTone(520, 0.09);
 
-    // Unlock audio di browser HP (iOS/Android butuh interaksi tombol pertama)
     if (bgmMars) {
       bgmMars
         .play()
@@ -194,7 +213,6 @@ document.addEventListener("DOMContentLoaded", () => {
     statusDot.classList.add("found");
     statusText.textContent = "Marker Terdeteksi";
 
-    // Trigger animasi pop-in & putar Mars UIN
     scenes[currentMenu]?.emit("popin");
     syncMarsAudio();
   });
@@ -205,7 +223,6 @@ document.addEventListener("DOMContentLoaded", () => {
     statusDot.classList.remove("found");
     statusText.textContent = "Mencari Marker...";
 
-    // Otomatis pause Mars UIN saat kamera lepas dari marker
     syncMarsAudio();
   });
 
@@ -218,7 +235,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!el) return;
       const active = k === key;
       el.setAttribute("visible", active);
-      if (active) el.emit("popin"); // Efek pop-in membal saat ganti menu
+      if (active) el.emit("popin");
     });
 
     hudButtons.forEach((btn) => {
@@ -260,11 +277,21 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     cardTitle.textContent = item.title;
     cardDesc.textContent = item.desc;
-    cardLink.style.display = "none";
 
-    karya3dObj.setAttribute("color", item.color);
-    karya3dRing.setAttribute("color", item.color);
+    if (item.link) {
+      cardLink.href = item.link;
+      cardLink.style.display = "inline-block";
+    } else {
+      cardLink.style.display = "none";
+    }
+
+    // Ganti model .glb yang tampil
+    Object.entries(karyaModels).forEach(([mKey, mEl]) => {
+      if (mEl) mEl.setAttribute("visible", mKey === item.model);
+    });
+
     pedestalRing?.setAttribute("color", item.color);
+    accentLight?.setAttribute("color", item.color);
     karya3dLabel.setAttribute("value", item.label);
     scenes.karya?.emit("popin");
   };
@@ -285,7 +312,6 @@ document.addEventListener("DOMContentLoaded", () => {
     infoCard.classList.remove("show");
   });
 
-  // Sentuh objek 3D utama -> animasi berputar cepat + buka info
   heroObj?.addEventListener("click", () => {
     playTone(900, 0.09, "triangle");
     heroObj.emit("tapped");

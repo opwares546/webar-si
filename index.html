@@ -87,7 +87,8 @@
         <button class="karya-pill active" data-karya="koperasiku">
           Koperasiku
         </button>
-        <button class="karya-pill" data-karya="juragantani">Juragantani</button>
+        <button class="karya-pill" data-karya="egoosport">Egoo Sport</button>
+        <button class="karya-pill" data-karya="spksmart">SPK SMART</button>
         <button class="karya-pill" data-karya="ews">EWS Anti-Drone</button>
         <button class="karya-pill" data-karya="smartcar">Smart Car</button>
       </div>
@@ -125,8 +126,19 @@
       device-orientation-permission-ui="enabled: false"
     >
       <a-assets>
-        <!-- Nanti tambahkan file .glb dari Anggota 3 di sini -->
-        <!-- <a-asset-item id="model-logo" src="./assets/models/logo-hmps.glb"></a-asset-item> -->
+        <img id="img-logo-hmps" src="./assets/ui/logo-hmps.png" />
+        <a-asset-item
+          id="model-laptop"
+          src="./assets/models/laptop.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="model-drone"
+          src="./assets/models/drone.glb"
+        ></a-asset-item>
+        <a-asset-item
+          id="model-robot"
+          src="./assets/models/robot.glb"
+        ></a-asset-item>
       </a-assets>
 
       <a-camera
@@ -137,7 +149,7 @@
       ></a-camera>
 
       <!-- Pencahayaan Dinamis -->
-      <a-light type="ambient" color="#ffffff" intensity="1.3"></a-light>
+      <a-light type="ambient" color="#ffffff" intensity="1.5"></a-light>
       <a-light
         id="accent-light"
         type="point"
@@ -147,9 +159,9 @@
       ></a-light>
       <a-light
         type="directional"
-        color="#38bdf8"
-        intensity="1.2"
-        position="-1 2 1"
+        color="#ffffff"
+        intensity="1.4"
+        position="-1 2 2"
       ></a-light>
 
       <!-- Target Marker -->
@@ -158,7 +170,6 @@
         <a-entity id="ar-stage" scale="1 1 1" rotation="0 0 0">
           <!-- ===== HOLOGRAM BASE & AMBIENT PARTICLES ===== -->
           <a-entity position="0 -0.34 0.04">
-            <!-- Cincin Utama (berubah warna sesuai menu) -->
             <a-ring
               id="pedestal-ring"
               radius-inner="0.34"
@@ -167,7 +178,6 @@
               opacity="0.9"
               animation="property: rotation; to: 0 0 360; loop: true; dur: 6000; easing: linear"
             ></a-ring>
-            <!-- Cincin Luar Putus-Putus Simulasi -->
             <a-ring
               radius-inner="0.44"
               radius-outer="0.46"
@@ -175,7 +185,6 @@
               opacity="0.55"
               animation="property: rotation; to: 0 0 -360; loop: true; dur: 10000; easing: linear"
             ></a-ring>
-            <!-- Efek Pulse Radar di Dasar -->
             <a-ring
               radius-inner="0.2"
               radius-outer="0.23"
@@ -186,7 +195,7 @@
             ></a-ring>
           </a-entity>
 
-          <!-- Partikel Melayang di Sekitar Hologram -->
+          <!-- Partikel Melayang -->
           <a-sphere
             position="-0.48 -0.1 0.14"
             radius="0.022"
@@ -212,45 +221,65 @@
             animation="property: position; to: 0.36 0.32 0.2; dir: alternate; loop: true; dur: 3400; easing: easeInOutSine"
           ></a-sphere>
 
-          <!-- ===== KONTEN 1: MENU UTAMA (Hologram Giroskop 3D) ===== -->
+          <!-- ===== KONTEN 1: MENU UTAMA (MEDALI LOGO HMPS SI 3D) ===== -->
           <a-entity
             id="scene-utama"
             visible="true"
             animation__pop="property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 550; easing: easeOutBack; startEvents: popin"
           >
-            <!-- Inti 3D Interaktif (Sentuh untuk bounce!) -->
             <a-entity
               id="interactive-hero"
               class="clickable"
-              position="0 0.18 0.2"
-              animation="property: position; to: 0 0.26 0.2; dir: alternate; loop: true; dur: 1900; easing: easeInOutSine"
+              position="0 0.2 0.2"
+              animation="property: position; to: 0 0.27 0.2; dir: alternate; loop: true; dur: 1900; easing: easeInOutSine"
               animation__tap="property: rotation; from: 0 0 0; to: 0 360 0; dur: 650; easing: easeOutCubic; startEvents: tapped"
             >
-              <a-octahedron
-                radius="0.18"
-                color="#10b981"
-                metalness="0.4"
-                roughness="0.15"
-                animation="property: rotation; to: 0 360 0; loop: true; dur: 5000; easing: linear"
-              ></a-octahedron>
-              <!-- Cincin Orbit 1 -->
+              <!-- Medali 3D Berputar -->
+              <a-entity
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 6500; easing: linear"
+              >
+                <a-cylinder
+                  radius="0.22"
+                  height="0.035"
+                  rotation="90 0 0"
+                  color="#0f172a"
+                  metalness="0.6"
+                  roughness="0.25"
+                ></a-cylinder>
+                <a-torus
+                  radius="0.22"
+                  radius-tubular="0.016"
+                  color="#f59e0b"
+                  metalness="0.7"
+                  roughness="0.2"
+                ></a-torus>
+                <!-- Logo Depan -->
+                <a-circle
+                  src="#img-logo-hmps"
+                  radius="0.19"
+                  position="0 0 0.02"
+                  material="transparent: true; alphaTest: 0.1; shader: flat;"
+                ></a-circle>
+                <!-- Logo Belakang -->
+                <a-circle
+                  src="#img-logo-hmps"
+                  radius="0.19"
+                  position="0 0 -0.02"
+                  rotation="0 180 0"
+                  material="transparent: true; alphaTest: 0.1; shader: flat;"
+                ></a-circle>
+              </a-entity>
+
+              <!-- Cincin Orbit Hologram -->
               <a-torus
-                radius="0.28"
-                radius-tubular="0.011"
+                radius="0.32"
+                radius-tubular="0.009"
                 color="#38bdf8"
-                animation="property: rotation; to: 360 180 0; loop: true; dur: 5500; easing: linear"
-              ></a-torus>
-              <!-- Cincin Orbit 2 -->
-              <a-torus
-                radius="0.34"
-                radius-tubular="0.008"
-                color="#a7f3d0"
-                opacity="0.8"
-                animation="property: rotation; to: -180 360 90; loop: true; dur: 7500; easing: linear"
+                animation="property: rotation; to: 360 180 0; loop: true; dur: 6000; easing: linear"
               ></a-torus>
             </a-entity>
 
-            <!-- Papan Nama Melayang 3D (Berlapis) -->
+            <!-- Papan Nama Melayang -->
             <a-entity position="0 -0.18 0.16">
               <a-box
                 width="0.98"
@@ -275,7 +304,7 @@
             </a-entity>
           </a-entity>
 
-          <!-- ===== KONTEN 2: PROFIL PRODI (3D Parallax Card) ===== -->
+          <!-- ===== KONTEN 2: PROFIL PRODI ===== -->
           <a-entity
             id="scene-profil"
             visible="false"
@@ -284,7 +313,6 @@
             <a-entity
               animation="property: position; from: 0 0.14 0.12; to: 0 0.19 0.12; dir: alternate; loop: true; dur: 2400; easing: easeInOutSine"
             >
-              <!-- Frame Belakang (Glow) -->
               <a-plane
                 position="0 0 -0.02"
                 width="1.22"
@@ -292,7 +320,6 @@
                 color="#38bdf8"
                 opacity="0.28"
               ></a-plane>
-              <!-- Panel Utama 3D -->
               <a-box
                 width="1.16"
                 height="0.66"
@@ -300,7 +327,6 @@
                 color="#0f172a"
                 opacity="0.94"
               ></a-box>
-              <!-- Header Badge Melayang di Depan (Parallax Z) -->
               <a-box
                 position="0 0.35 0.05"
                 width="0.72"
@@ -315,7 +341,6 @@
                 scale="0.28 0.28 0.28"
                 color="#ffffff"
               ></a-text>
-              <!-- Isi Teks -->
               <a-text
                 value="FEBI • UIN Mahmud Yunus Batusangkar\n\nMemadukan Teknologi Informasi,\nManajemen, dan Bisnis Islam Modern\nuntuk Mencetak Talenta Digital Unggul"
                 align="center"
@@ -420,37 +445,50 @@
             </a-entity>
           </a-entity>
 
-          <!-- ===== KONTEN 5: SHOWCASE KARYA ===== -->
+          <!-- ===== KONTEN 5: SHOWCASE KARYA (MODEL 3D .GLB ASLI) ===== -->
           <a-entity
             id="scene-karya"
             visible="false"
             animation__pop="property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 500; easing: easeOutBack; startEvents: popin"
           >
             <a-entity
-              position="0 0.22 0.2"
-              animation="property: position; to: 0 0.3 0.2; dir: alternate; loop: true; dur: 1700; easing: easeInOutSine"
+              position="0 0.18 0.2"
+              animation="property: position; to: 0 0.25 0.2; dir: alternate; loop: true; dur: 1800; easing: easeInOutSine"
             >
-              <a-dodecahedron
-                id="karya-3d-obj"
-                class="clickable"
-                radius="0.18"
-                color="#f59e0b"
-                metalness="0.35"
-                roughness="0.2"
-                animation="property: rotation; to: 360 360 0; loop: true; dur: 6500; easing: linear"
-              ></a-dodecahedron>
-              <a-torus
-                id="karya-3d-ring"
-                radius="0.28"
-                radius-tubular="0.01"
-                color="#fde68a"
-                animation="property: rotation; to: 180 360 0; loop: true; dur: 5000; easing: linear"
-              ></a-torus>
+              <!-- Model Laptop (Koperasiku, Egoo Sport, SPK SMART) -->
+              <a-gltf-model
+                id="karya-model-laptop"
+                src="#model-laptop"
+                scale="0.22 0.22 0.22"
+                rotation="15 0 0"
+                visible="true"
+                animation="property: rotation; to: 15 360 0; loop: true; dur: 7500; easing: linear"
+              ></a-gltf-model>
+
+              <!-- Model Drone (EWS Anti-Drone) -->
+              <a-gltf-model
+                id="karya-model-drone"
+                src="#model-drone"
+                scale="0.22 0.22 0.22"
+                rotation="10 0 0"
+                visible="false"
+                animation="property: rotation; to: 10 360 0; loop: true; dur: 6500; easing: linear"
+              ></a-gltf-model>
+
+              <!-- Model Robot (Smart Car) -->
+              <a-gltf-model
+                id="karya-model-robot"
+                src="#model-robot"
+                scale="0.22 0.22 0.22"
+                rotation="0 0 0"
+                visible="false"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 7000; easing: linear"
+              ></a-gltf-model>
             </a-entity>
 
-            <a-entity position="0 -0.16 0.16">
+            <a-entity position="0 -0.18 0.16">
               <a-box
-                width="1.05"
+                width="1.08"
                 height="0.24"
                 depth="0.025"
                 color="#0f172a"
@@ -461,7 +499,7 @@
                 value="KOPERASIKU\nManajemen Koperasi Digital"
                 align="center"
                 position="0 0 0.02"
-                scale="0.28 0.28 0.28"
+                scale="0.27 0.27 0.27"
                 color="#fef3c7"
               ></a-text>
             </a-entity>
