@@ -15,23 +15,34 @@ document.addEventListener("DOMContentLoaded", () => {
   const cardLink = document.getElementById("card-link");
   const btnCloseCard = document.getElementById("btn-close-card");
 
+  const profilPillsBox = document.getElementById("profil-pills");
+  const profilPills = document.querySelectorAll(".profil-pill");
   const karyaPillsBox = document.getElementById("karya-pills");
   const karyaPills = document.querySelectorAll(".karya-pill[data-karya]");
-  const videoPillsBox = document.getElementById("video-pills");
-  const videoPills = document.querySelectorAll(".video-pill");
 
   const sceneEl = document.getElementById("ar-scene");
   const targetEl = document.getElementById("ar-target");
   const arStage = document.getElementById("ar-stage");
   const pedestalRing = document.getElementById("pedestal-ring");
   const accentLight = document.getElementById("accent-light");
-  const karya3dLabel = document.getElementById("karya-3d-label");
   const heroObj = document.getElementById("interactive-hero");
-  const arVideoScreen = document.getElementById("ar-video-screen");
-  const video3dTitle = document.getElementById("video-3d-title");
+
+  // Elemen Profil 3D
+  const profil3dBadge = document.getElementById("profil-3d-badge");
+  const profil3dText = document.getElementById("profil-3d-text");
+
+  // Elemen Karya (Video Web + Model 3D IoT)
+  const karyaVideoWrapper = document.getElementById("karya-video-wrapper");
+  const karyaVideoFrame = document.getElementById("karya-video-frame");
+  const karyaVideoScreen = document.getElementById("karya-video-screen");
+  const karyaVideoBadgeBg = document.getElementById("karya-video-badge-bg");
+  const karyaVideoBadge = document.getElementById("karya-video-badge");
+
+  const karyaModelWrapper = document.getElementById("karya-model-wrapper");
+  const karyaLabelBox = document.getElementById("karya-label-box");
+  const karya3dLabel = document.getElementById("karya-3d-label");
 
   const karyaModels = {
-    laptop: document.getElementById("karya-model-laptop"),
     drone: document.getElementById("karya-model-drone"),
     robot: document.getElementById("karya-model-robot"),
   };
@@ -97,37 +108,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if (soundEnabled) playTone(680, 0.06);
   });
 
-  // ==================== KONTROL 3 VIDEO SHOWCASE ====================
-  let activeVidId = "vid-1";
-
-  const playSelectedVideo = (vidId) => {
-    activeVidId = vidId;
+  // ==================== KONTROL VIDEO DEMO WEB ====================
+  const playWebVideo = (vidId) => {
     Object.entries(videos).forEach(([id, el]) => {
       if (!el) return;
-      if (id === vidId) {
+      if (id === vidId && isTargetVisible) {
         el.play().catch(() => {});
       } else {
         el.pause();
       }
     });
-    arVideoScreen?.setAttribute("src", `#${vidId}`);
-    videoPills.forEach((p) =>
-      p.classList.toggle("active", p.dataset.vid === vidId),
-    );
-    const idx = vidId.split("-")[1];
-    video3dTitle?.setAttribute("value", `VIDEO SHOWCASE • ${idx} / 3`);
+    karyaVideoScreen?.setAttribute("src", `#${vidId}`);
   };
 
   const pauseAllVideos = () => {
     Object.values(videos).forEach((el) => el?.pause());
   };
-
-  videoPills.forEach((pill) => {
-    pill.addEventListener("click", () => {
-      playTone(720, 0.05);
-      playSelectedVideo(pill.dataset.vid);
-    });
-  });
 
   // ==================== DATA KONTEN ====================
   const menuData = {
@@ -138,8 +134,8 @@ document.addEventListener("DOMContentLoaded", () => {
       accent: "#10b981",
     },
     profil: {
-      title: "Profil Prodi Sistem Informasi",
-      desc: "Berada di bawah Fakultas Ekonomi dan Bisnis Islam (FEBI) UIN Mahmud Yunus Batusangkar. Memadukan teknologi informasi, manajemen, dan bisnis digital.",
+      title: "Visi Prodi Sistem Informasi",
+      desc: "Unggul dalam Bidang Sistem Informasi yang bereputasi Global yang Terintegrasi dengan Nilai-nilai Keislaman, Teknologi Terkini, dan Kebutuhan Industri.",
       link: "https://uinmybatusangkar.ac.id",
       accent: "#38bdf8",
     },
@@ -157,15 +153,39 @@ document.addEventListener("DOMContentLoaded", () => {
     },
     karya: {
       title: "Showcase Karya Mahasiswa",
-      desc: "Pilih salah satu proyek unggulan di atas untuk melihat model 3D dan detail inovasi mahasiswa Sistem Informasi.",
+      desc: "Pilih salah satu proyek di atas untuk melihat demo aplikasi web dan prototipe IoT mahasiswa Sistem Informasi.",
       link: null,
-      accent: "#f59e0b",
+      accent: "#10b981",
     },
     hmps: {
-      title: "Kegiatan & Video HMPS SI",
+      title: "Kegiatan HMPS SI",
       desc: "Aktif menggelar IT FEST, workshop pemrograman & desain grafis, pengabdian masyarakat, serta kegiatan pengembangan soft-skill mahasiswa.",
       link: "https://instagram.com",
       accent: "#f43f5e",
+    },
+  };
+
+  const profilData = {
+    visi: {
+      title: "Visi Prodi Sistem Informasi",
+      desc: "Unggul dalam Bidang Sistem Informasi yang bereputasi Global yang Terintegrasi dengan Nilai-nilai Keislaman, Teknologi Terkini, dan Kebutuhan Industri.",
+      badge3d: "VISI PRODI SI",
+      text3d:
+        "Unggul dalam Bidang Sistem Informasi\nyang bereputasi Global yang Terintegrasi\ndengan Nilai-nilai Keislaman,\nTeknologi Terkini, dan Kebutuhan Industri.",
+    },
+    misi: {
+      title: "Misi Prodi Sistem Informasi",
+      desc: "1. Menyelenggarakan pendidikan bermutu dalam bidang sistem informasi terintegrasi nilai-nilai keislaman.\n2. Mengelola program studi secara profesional, kompeten, dan berdaya saing nasional & internasional.\n3. Melaksanakan pengabdian masyarakat berorientasi pengembangan IPTEK di bidang Sistem Informasi.\n4. Melaksanakan penelitian keilmuan Sistem Informasi yang integratif.\n5. Menjalin kerjasama strategis dengan pemerintah, industri, dan institusi pendidikan dalam & luar negeri.",
+      badge3d: "MISI PRODI SI",
+      text3d:
+        "1. Pendidikan bermutu bernilai keislaman\n2. Tata kelola profesional & berdaya saing\n3. Pengabdian masyarakat berbasis IPTEK SI\n4. Penelitian keilmuan SI yang integratif\n5. Kerjasama strategis dalam & luar negeri",
+    },
+    tujuan: {
+      title: "Tujuan Prodi Sistem Informasi",
+      desc: "1. Menghasilkan lulusan berkompetensi tinggi dalam pengembangan & penerapan SI sesuai kebutuhan industri dan ekonomi syariah.\n2. Menghasilkan karya ilmiah inovatif yang berkontribusi di bidang ekonomi dan bisnis.\n3. Meningkatkan pengabdian masyarakat melalui pemanfaatan TI untuk ekonomi berbasis keislaman.\n4. Mewujudkan tata kelola program studi yang transparan, akuntabel, dan berkeadilan.",
+      badge3d: "TUJUAN PRODI SI",
+      text3d:
+        "1. Lulusan kompeten di industri & ekonomi syariah\n2. Karya ilmiah inovatif di ekonomi & bisnis\n3. Pemanfaatan TI untuk ekonomi keislaman\n4. Tata kelola transparan, akuntabel & adil",
     },
   };
 
@@ -174,40 +194,45 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "Koperasiku (Web App)",
       desc: "Aplikasi manajemen koperasi digital berbasis Laravel, Inertia.js, dan Vue.js untuk pengelolaan data anggota serta transaksi simpan pinjam.",
       color: "#10b981",
-      label: "KOPERASIKU\nManajemen Koperasi Digital",
-      model: "laptop",
+      mediaType: "video",
+      videoId: "vid-1",
+      badge: "DEMO WEB • KOPERASIKU",
       link: null,
     },
     egoosport: {
       title: "Egoo Sport (E-Commerce)",
       desc: "Platform e-commerce perlengkapan olahraga berbasis PHP & MySQL dengan katalog interaktif dan sistem keranjang belanja.",
       color: "#f97316",
-      label: "EGOO SPORT\nE-Commerce Perlengkapan Olahraga",
-      model: "laptop",
+      mediaType: "video",
+      videoId: "vid-2",
+      badge: "DEMO WEB • EGOO SPORT",
       link: null,
     },
     spksmart: {
       title: "SPK MVP La Liga (SMART)",
       desc: "Sistem Penunjang Keputusan berbasis Laravel & Vue.js menggunakan metode SMART, lengkap dengan grafik interaktif dan ekspor PDF.",
       color: "#eab308",
-      label: "SPK METODE SMART\nSistem Penunjang Keputusan",
-      model: "laptop",
+      mediaType: "video",
+      videoId: "vid-3",
+      badge: "DEMO WEB • SPK SMART",
       link: "https://github.com/opwares546/spk-laliga",
     },
     ews: {
       title: "EWS Anti-Drone (IoT + AI)",
       desc: "Sistem peringatan dini pendeteksi drone menggabungkan sensor radar ESP8266, computer vision YOLOv8, dan pelacakan kamera otomatis.",
       color: "#f43f5e",
-      label: "EWS ANTI-DRONE\nIoT Radar & YOLOv8 AI",
+      mediaType: "model",
       model: "drone",
+      label: "EWS ANTI-DRONE\nIoT Radar & YOLOv8 AI",
       link: null,
     },
     smartcar: {
       title: "Smart Robot Car (IoT)",
       desc: "Mobil robot pintar berbasis ESP8266 Wi-Fi dengan layar OLED ekspresif yang dikembangkan untuk pameran teknologi kampus.",
       color: "#38bdf8",
-      label: "SMART ROBOT CAR\nESP8266 Wi-Fi + OLED",
+      mediaType: "model",
       model: "robot",
+      label: "SMART ROBOT CAR\nESP8266 Wi-Fi + OLED",
       link: null,
     },
   };
@@ -222,12 +247,13 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   let currentMenu = "utama";
+  let activeProfilKey = "visi";
+  let activeKaryaKey = "koperasiku";
 
   // ==================== MULAI KAMERA AR ====================
   btnStart.addEventListener("click", async () => {
     playTone(520, 0.09);
 
-    // Unlock audio & video di browser HP saat interaksi tombol pertama
     if (bgmMars) {
       bgmMars
         .play()
@@ -269,8 +295,11 @@ document.addEventListener("DOMContentLoaded", () => {
     scenes[currentMenu]?.emit("popin");
     syncMarsAudio();
 
-    if (currentMenu === "hmps") {
-      playSelectedVideo(activeVidId);
+    if (currentMenu === "karya") {
+      const currentItem = karyaData[activeKaryaKey];
+      if (currentItem?.mediaType === "video") {
+        playWebVideo(currentItem.videoId);
+      }
     }
   });
 
@@ -306,25 +335,15 @@ document.addEventListener("DOMContentLoaded", () => {
       accentLight?.setAttribute("color", data.accent);
     }
 
-    // Atur visibilitas sub-menu Karya & Video
+    // Atur visibilitas sub-menu Profil & Karya
+    profilPillsBox.style.display = key === "profil" ? "flex" : "none";
     karyaPillsBox.style.display = key === "karya" ? "flex" : "none";
-    videoPillsBox.style.display = key === "hmps" ? "flex" : "none";
 
-    if (key === "karya") {
+    if (key === "profil") {
       pauseAllVideos();
-      selectKarya("koperasiku");
-    } else if (key === "hmps") {
-      if (isTargetVisible) {
-        playSelectedVideo(activeVidId);
-      }
-      cardTitle.textContent = data.title;
-      cardDesc.textContent = data.desc;
-      if (data.link) {
-        cardLink.href = data.link;
-        cardLink.style.display = "inline-block";
-      } else {
-        cardLink.style.display = "none";
-      }
+      selectProfil(activeProfilKey);
+    } else if (key === "karya") {
+      selectKarya(activeKaryaKey);
     } else {
       pauseAllVideos();
       if (data) {
@@ -342,10 +361,30 @@ document.addEventListener("DOMContentLoaded", () => {
     infoCard.classList.add("show");
   };
 
+  const selectProfil = (profilKey) => {
+    const item = profilData[profilKey];
+    if (!item) return;
+
+    activeProfilKey = profilKey;
+    profilPills.forEach((p) =>
+      p.classList.toggle("active", p.dataset.profil === profilKey),
+    );
+    cardTitle.textContent = item.title;
+    cardDesc.textContent = item.desc;
+
+    cardLink.href = menuData.profil.link;
+    cardLink.style.display = "inline-block";
+
+    profil3dBadge?.setAttribute("value", item.badge3d);
+    profil3dText?.setAttribute("value", item.text3d);
+    scenes.profil?.emit("popin");
+  };
+
   const selectKarya = (karyaKey) => {
     const item = karyaData[karyaKey];
     if (!item) return;
 
+    activeKaryaKey = karyaKey;
     karyaPills.forEach((p) =>
       p.classList.toggle("active", p.dataset.karya === karyaKey),
     );
@@ -359,19 +398,42 @@ document.addEventListener("DOMContentLoaded", () => {
       cardLink.style.display = "none";
     }
 
-    // Ganti model .glb yang tampil
-    Object.entries(karyaModels).forEach(([mKey, mEl]) => {
-      if (mEl) mEl.setAttribute("visible", mKey === item.model);
-    });
-
     pedestalRing?.setAttribute("color", item.color);
     accentLight?.setAttribute("color", item.color);
-    karya3dLabel.setAttribute("value", item.label);
+
+    if (item.mediaType === "video") {
+      karyaVideoWrapper?.setAttribute("visible", true);
+      karyaModelWrapper?.setAttribute("visible", false);
+      karyaLabelBox?.setAttribute("visible", false);
+
+      karyaVideoFrame?.setAttribute("color", item.color);
+      karyaVideoBadgeBg?.setAttribute("color", item.color);
+      karyaVideoBadge?.setAttribute("value", item.badge);
+      playWebVideo(item.videoId);
+    } else {
+      pauseAllVideos();
+      karyaVideoWrapper?.setAttribute("visible", false);
+      karyaModelWrapper?.setAttribute("visible", true);
+      karyaLabelBox?.setAttribute("visible", true);
+
+      Object.entries(karyaModels).forEach(([mKey, mEl]) => {
+        if (mEl) mEl.setAttribute("visible", mKey === item.model);
+      });
+      karya3dLabel?.setAttribute("value", item.label);
+    }
+
     scenes.karya?.emit("popin");
   };
 
   hudButtons.forEach((btn) => {
     btn.addEventListener("click", () => switchMenu(btn.dataset.menu));
+  });
+
+  profilPills.forEach((pill) => {
+    pill.addEventListener("click", () => {
+      playTone(720, 0.05);
+      selectProfil(pill.dataset.profil);
+    });
   });
 
   karyaPills.forEach((pill) => {

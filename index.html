@@ -40,8 +40,7 @@
       <h1>WebAR Sistem Informasi</h1>
       <p>
         Pindai brosur resmi Prodi Sistem Informasi untuk menjelajahi profil,
-        prospek karir, showcase karya, dan video kegiatan dalam bentuk 3D
-        interaktif.
+        prospek karir, dan showcase karya mahasiswa dalam bentuk 3D interaktif.
       </p>
       <button id="btn-start-ar">Aktifkan Kamera AR</button>
     </div>
@@ -81,11 +80,25 @@
       <button id="btn-spin" class="icon-btn" title="Putar 90°">🔄</button>
     </div>
 
-    <!-- 5. Kartu Detail, Sub-Menu Karya & Sub-Menu Video -->
+    <!-- 5. Kartu Detail, Sub-Menu Profil & Sub-Menu Karya -->
     <div id="info-card">
       <h3 id="card-title">Judul Menu</h3>
 
-      <!-- Pilihan 5 Proyek Karya -->
+      <!-- Sub-Menu Profil (Visi, Misi, Tujuan) -->
+      <div
+        id="profil-pills"
+        style="display: none; flex-wrap: wrap; gap: 6px; margin-bottom: 12px"
+      >
+        <button class="karya-pill profil-pill active" data-profil="visi">
+          Visi
+        </button>
+        <button class="karya-pill profil-pill" data-profil="misi">Misi</button>
+        <button class="karya-pill profil-pill" data-profil="tujuan">
+          Tujuan
+        </button>
+      </div>
+
+      <!-- Sub-Menu Karya -->
       <div id="karya-pills">
         <button class="karya-pill active" data-karya="koperasiku">
           Koperasiku
@@ -96,19 +109,9 @@
         <button class="karya-pill" data-karya="smartcar">Smart Car</button>
       </div>
 
-      <!-- Pilihan 3 Video HMPS SI -->
-      <div
-        id="video-pills"
-        style="display: none; flex-wrap: wrap; gap: 6px; margin-bottom: 12px"
-      >
-        <button class="karya-pill video-pill active" data-vid="vid-1">
-          Video 1
-        </button>
-        <button class="karya-pill video-pill" data-vid="vid-2">Video 2</button>
-        <button class="karya-pill video-pill" data-vid="vid-3">Video 3</button>
-      </div>
-
-      <p id="card-desc">Deskripsi konten akan muncul di sini.</p>
+      <p id="card-desc" style="white-space: pre-line">
+        Deskripsi konten akan muncul di sini.
+      </p>
       <div class="card-actions">
         <a
           id="card-link"
@@ -145,11 +148,7 @@
         <!-- Logo HMPS -->
         <img id="img-logo-hmps" src="./assets/ui/logo-hmps.png" />
 
-        <!-- 3 Model 3D (.glb) -->
-        <a-asset-item
-          id="model-laptop"
-          src="./assets/models/laptop.glb"
-        ></a-asset-item>
+        <!-- Model 3D (.glb) -->
         <a-asset-item
           id="model-drone"
           src="./assets/models/drone.glb"
@@ -159,7 +158,7 @@
           src="./assets/models/robot.glb"
         ></a-asset-item>
 
-        <!-- 3 Video Showcase (.mp4) -->
+        <!-- 3 Video Demo Website (.mp4) -->
         <video
           id="vid-1"
           src="./assets/videos/video-1.mp4"
@@ -285,7 +284,6 @@
               animation="property: position; to: 0 0.27 0.2; dir: alternate; loop: true; dur: 1900; easing: easeInOutSine"
               animation__tap="property: rotation; from: 0 0 0; to: 0 360 0; dur: 650; easing: easeOutCubic; startEvents: tapped"
             >
-              <!-- Medali 3D Berputar -->
               <a-entity
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 6500; easing: linear"
               >
@@ -304,14 +302,12 @@
                   metalness="0.7"
                   roughness="0.2"
                 ></a-torus>
-                <!-- Logo Depan -->
                 <a-circle
                   src="#img-logo-hmps"
                   radius="0.19"
                   position="0 0 0.02"
                   material="transparent: true; alphaTest: 0.1; shader: flat;"
                 ></a-circle>
-                <!-- Logo Belakang -->
                 <a-circle
                   src="#img-logo-hmps"
                   radius="0.19"
@@ -321,7 +317,6 @@
                 ></a-circle>
               </a-entity>
 
-              <!-- Cincin Orbit Hologram -->
               <a-torus
                 radius="0.32"
                 radius-tubular="0.009"
@@ -330,7 +325,6 @@
               ></a-torus>
             </a-entity>
 
-            <!-- Papan Nama Melayang -->
             <a-entity position="0 -0.18 0.16">
               <a-box
                 width="0.98"
@@ -355,7 +349,7 @@
             </a-entity>
           </a-entity>
 
-          <!-- ===== KONTEN 2: PROFIL PRODI ===== -->
+          <!-- ===== KONTEN 2: PROFIL PRODI (VISI, MISI, TUJUAN) ===== -->
           <a-entity
             id="scene-profil"
             visible="false"
@@ -366,37 +360,39 @@
             >
               <a-plane
                 position="0 0 -0.02"
-                width="1.22"
-                height="0.72"
+                width="1.26"
+                height="0.76"
                 color="#38bdf8"
                 opacity="0.28"
               ></a-plane>
               <a-box
-                width="1.16"
-                height="0.66"
+                width="1.20"
+                height="0.70"
                 depth="0.03"
                 color="#0f172a"
                 opacity="0.94"
               ></a-box>
               <a-box
-                position="0 0.35 0.05"
+                position="0 0.37 0.05"
                 width="0.72"
                 height="0.13"
                 depth="0.025"
                 color="#0284c7"
               ></a-box>
               <a-text
-                value="PROFIL PRODI SI"
+                id="profil-3d-badge"
+                value="VISI PRODI SI"
                 align="center"
-                position="0 0.35 0.07"
-                scale="0.28 0.28 0.28"
+                position="0 0.37 0.07"
+                scale="0.27 0.27 0.27"
                 color="#ffffff"
               ></a-text>
               <a-text
-                value="FEBI • UIN Mahmud Yunus Batusangkar\n\nMemadukan Teknologi Informasi,\nManajemen, dan Bisnis Islam Modern\nuntuk Mencetak Talenta Digital Unggul"
+                id="profil-3d-text"
+                value="Unggul dalam Bidang Sistem Informasi\nyang bereputasi Global yang Terintegrasi\ndengan Nilai-nilai Keislaman,\nTeknologi Terkini, dan Kebutuhan Industri."
                 align="center"
                 position="0 -0.02 0.03"
-                scale="0.25 0.25 0.25"
+                scale="0.23 0.23 0.23"
                 color="#e2e8f0"
               ></a-text>
             </a-entity>
@@ -496,27 +492,58 @@
             </a-entity>
           </a-entity>
 
-          <!-- ===== KONTEN 5: SHOWCASE KARYA (MODEL 3D .GLB ASLI) ===== -->
+          <!-- ===== KONTEN 5: SHOWCASE KARYA (3 VIDEO WEB + 2 MODEL 3D IOT) ===== -->
           <a-entity
             id="scene-karya"
             visible="false"
             animation__pop="property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 500; easing: easeOutBack; startEvents: popin"
           >
+            <!-- Layar Video Demo untuk 3 Karya Web -->
             <a-entity
+              id="karya-video-wrapper"
+              visible="true"
+              animation="property: position; from: 0 0.14 0.14; to: 0 0.19 0.14; dir: alternate; loop: true; dur: 2400; easing: easeInOutSine"
+            >
+              <a-plane
+                id="karya-video-frame"
+                position="0 0 -0.02"
+                width="1.22"
+                height="0.74"
+                color="#10b981"
+                opacity="0.38"
+              ></a-plane>
+              <a-video
+                id="karya-video-screen"
+                src="#vid-1"
+                width="1.16"
+                height="0.65"
+                position="0 0 0.01"
+              ></a-video>
+              <a-box
+                id="karya-video-badge-bg"
+                position="0 0.37 0.04"
+                width="0.88"
+                height="0.11"
+                depth="0.02"
+                color="#10b981"
+              ></a-box>
+              <a-text
+                id="karya-video-badge"
+                value="DEMO WEB • KOPERASIKU"
+                align="center"
+                position="0 0.37 0.06"
+                scale="0.23 0.23 0.23"
+                color="#ffffff"
+              ></a-text>
+            </a-entity>
+
+            <!-- Model 3D untuk Karya IoT -->
+            <a-entity
+              id="karya-model-wrapper"
+              visible="false"
               position="0 0.18 0.2"
               animation="property: position; to: 0 0.25 0.2; dir: alternate; loop: true; dur: 1800; easing: easeInOutSine"
             >
-              <!-- Model Laptop (Koperasiku, Egoo Sport, SPK SMART) -->
-              <a-gltf-model
-                id="karya-model-laptop"
-                src="#model-laptop"
-                scale="0.22 0.22 0.22"
-                rotation="15 0 0"
-                visible="true"
-                animation="property: rotation; to: 15 360 0; loop: true; dur: 7500; easing: linear"
-              ></a-gltf-model>
-
-              <!-- Model Drone (EWS Anti-Drone) -->
               <a-gltf-model
                 id="karya-model-drone"
                 src="#model-drone"
@@ -526,7 +553,6 @@
                 animation="property: rotation; to: 10 360 0; loop: true; dur: 6500; easing: linear"
               ></a-gltf-model>
 
-              <!-- Model Robot (Smart Car) -->
               <a-gltf-model
                 id="karya-model-robot"
                 src="#model-robot"
@@ -537,7 +563,11 @@
               ></a-gltf-model>
             </a-entity>
 
-            <a-entity position="0 -0.18 0.16">
+            <a-entity
+              id="karya-label-box"
+              visible="false"
+              position="0 -0.18 0.16"
+            >
               <a-box
                 width="1.08"
                 height="0.24"
@@ -547,7 +577,7 @@
               ></a-box>
               <a-text
                 id="karya-3d-label"
-                value="KOPERASIKU\nManajemen Koperasi Digital"
+                value="EWS ANTI-DRONE\nIoT Radar & YOLOv8 AI"
                 align="center"
                 position="0 0 0.02"
                 scale="0.27 0.27 0.27"
@@ -556,46 +586,49 @@
             </a-entity>
           </a-entity>
 
-          <!-- ===== KONTEN 6: KEGIATAN HMPS SI (LAYAR 3 VIDEO SHOWCASE) ===== -->
+          <!-- ===== KONTEN 6: KEGIATAN HMPS SI ===== -->
           <a-entity
             id="scene-hmps"
             visible="false"
             animation__pop="property: scale; from: 0.01 0.01 0.01; to: 1 1 1; dur: 500; easing: easeOutBack; startEvents: popin"
           >
             <a-entity
-              animation="property: position; from: 0 0.14 0.14; to: 0 0.19 0.14; dir: alternate; loop: true; dur: 2400; easing: easeInOutSine"
+              animation="property: position; from: 0 0.14 0.12; to: 0 0.19 0.12; dir: alternate; loop: true; dur: 2400; easing: easeInOutSine"
             >
-              <!-- Bingkai Neon Belakang -->
               <a-plane
                 position="0 0 -0.02"
                 width="1.22"
-                height="0.74"
+                height="0.72"
                 color="#f43f5e"
-                opacity="0.35"
+                opacity="0.3"
               ></a-plane>
-              <!-- Layar Bioskop 3D 16:9 -->
-              <a-video
-                id="ar-video-screen"
-                src="#vid-1"
-                width="1.16"
-                height="0.65"
-                position="0 0 0.01"
-              ></a-video>
-              <!-- Header Badge -->
               <a-box
-                position="0 0.37 0.04"
-                width="0.82"
-                height="0.11"
-                depth="0.02"
+                width="1.16"
+                height="0.66"
+                depth="0.03"
+                color="#4c0519"
+                opacity="0.94"
+              ></a-box>
+              <a-box
+                position="0 0.35 0.05"
+                width="0.78"
+                height="0.13"
+                depth="0.025"
                 color="#e11d48"
               ></a-box>
               <a-text
-                id="video-3d-title"
-                value="VIDEO SHOWCASE • 1 / 3"
+                value="KEGIATAN HMPS SI"
                 align="center"
-                position="0 0.37 0.06"
-                scale="0.24 0.24 0.24"
+                position="0 0.35 0.07"
+                scale="0.27 0.27 0.27"
                 color="#ffffff"
+              ></a-text>
+              <a-text
+                value="• IT FEST (Kompetisi Web & Desain)\n• Workshop Coding & Graphic Design\n• Pengabdian Sosial & Tanggap Bencana\n• Outbound & Pengembangan Leadership"
+                align="center"
+                position="0 -0.02 0.03"
+                scale="0.24 0.24 0.24"
+                color="#ffe4e6"
               ></a-text>
             </a-entity>
           </a-entity>
